@@ -140,8 +140,9 @@ class WaldoBehatExtension implements ExtensionInterface
                 break;
             case 'waldo_server':
                 $container->setDefinition('waldo.screenshotter', new Definition('AndHeiberg\WaldoBehatExtension\Screenshotter\WaldoServerScreenshotter', [
-                    new Client,
-                    $config['screenshotter']['server']
+                    new Client([
+                        'base_uri' => $config['screenshotter']['server']
+                    ])
                 ]));
                 break;
             default:
@@ -165,8 +166,9 @@ class WaldoBehatExtension implements ExtensionInterface
                 break;
             case 'waldo_server':
                 $container->setDefinition('waldo.screenshot_comparer', new Definition('AndHeiberg\WaldoBehatExtension\Comparer\WaldoServerScreenshotComparer', [
-                    new Client,
-                    $config['screenshot_comparer']['server']
+                    new Client([
+                        'base_uri' => $config['screenshot_comparer']['server']
+                    ])
                 ]));
                 break;
             default:

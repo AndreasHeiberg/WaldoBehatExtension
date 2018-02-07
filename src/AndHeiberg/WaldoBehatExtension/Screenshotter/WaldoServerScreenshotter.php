@@ -14,20 +14,13 @@ class WaldoServerScreenshotter implements ScreenshotterInterface
     private $client;
 
     /**
-     * @var
-     */
-    private $url;
-
-    /**
      * WaldoServerScreenshotter constructor.
      *
      * @param ClientInterface $client
-     * @param                 $url
      */
-    public function __construct(ClientInterface $client, $url)
+    public function __construct(ClientInterface $client)
     {
         $this->client = $client;
-        $this->url = $url;
     }
 
     /**
@@ -37,12 +30,8 @@ class WaldoServerScreenshotter implements ScreenshotterInterface
     {
         $screenshot = $context->getSession()->getScreenshot();
 
-        $url = $this->url.'/api/v1/screenshots';
-
-        var_dump($url);
-
         try {
-            $response = $this->client->request('POST', $url, [
+            $config = [
                 'multipart' => [
                     [
                         'name'     => 'commit',
@@ -90,7 +79,8 @@ class WaldoServerScreenshotter implements ScreenshotterInterface
                         'filename' => 'screenshot.png'
                     ],
                 ]
-            ]);
+            ];
+            $response = $this->client->request('POST', '/api/screenshots', $config);
         } catch (\GuzzleHttp\Exception\ServerException $e) {
             // comparison image not found
 
