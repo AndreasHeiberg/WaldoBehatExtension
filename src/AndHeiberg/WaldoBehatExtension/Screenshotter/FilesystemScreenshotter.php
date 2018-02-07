@@ -3,38 +3,45 @@
 namespace AndHeiberg\WaldoBehatExtension\Screenshotter;
 
 use Behat\Behat\Hook\Scope\AfterStepScope;
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\MinkExtension\Context\RawMinkContext;
 use League\Flysystem\FilesystemInterface;
 
 class FilesystemScreenshotter implements ScreenshotterInterface
 {
     /**
-     * @var \DateTime
-     */
-    private $started;
-
-    /**
      * @var FilesystemInterface
      */
     private $filesystem;
+
+    /**
+     * @var bool
+     */
+    private $base;
+
+    /**
+     * @var \DateTime
+     */
+    private $started;
 
     /**
      * FilesystemScreenshotter constructor.
      *
      * @param FilesystemInterface $filesystem
      */
-    public function __construct(FilesystemInterface $filesystem)
+    public function __construct(FilesystemInterface $filesystem, $base = false)
     {
-        $this->started = new \DateTime;
         $this->filesystem = $filesystem;
+        $this->base = $base;
+        $this->started = new \DateTime;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function take(RawMinkContext $context, AfterStepScope $scope)
+    public function take(RawMinkContext $context, BeforeScenarioScope $scenarioScope, AfterStepScope $stepScope)
     {
-        $path = $this->getScreenshotPath($scope);
+        $path = $this->getScreenshotPath($scenarioScope, $stepScope);
         $screenshot = $context->getSession()->getScreenshot();
 
         $this->filesystem->write($path, $screenshot);
@@ -47,16 +54,22 @@ class FilesystemScreenshotter implements ScreenshotterInterface
      *
      * @return string
      */
-    public function getScreenshotPath(AfterStepScope $scope)
+    public function getScreenshotPath(BeforeScenarioScope $scenarioScope, AfterStepScope $stepScope)
     {
-        $file = $scope->getFeature()->getFile();
+        $file = $stepScope->getFeature()->getFile();
         $position = strpos($file, '/features');
 
         $feature = $this->formatString(substr($file, $position + 10, -7));
-        $step = $this->formatString($scope->getStep()->getText());
-        $dir = $this->started->format('YmdHis');
+        $scenario = $this->formatString($scenarioScope->getScenario()->getTitle());
+        $step = $this->formatString($stepScope->getStep()->getText());
 
-        return $dir.'/'.$feature.'/'.$step.'.png';
+        if ($this->base) {
+            $dir = 'base';
+        } else {
+            $dir = $this->started->format('YmdHis');
+        }
+
+        return $dir.'/'.$feature.'/'.$scenario.'/'.$step.'.png';
     }
 
     /**

@@ -2,14 +2,15 @@
 
 namespace AndHeiberg\WaldoBehatExtension;
 
-require_once __DIR__.'/../../../../../autoload.php';
-require_once __DIR__.'/../../../../../phpunit/phpunit/src/Framework/Assert/Functions.php';
-
 use AndHeiberg\WaldoBehatExtension\Comparer\ScreenshotComparerInterface;
 use AndHeiberg\WaldoBehatExtension\Screenshotter\ScreenshotterInterface;
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Behat\Hook\Scope\AfterStepScope;
 use Behat\MinkExtension\Context\RawMinkContext;
+
+require_once __DIR__.'/../../../../../autoload.php';
+require_once __DIR__.'/../../../../../phpunit/phpunit/src/Framework/Assert/Functions.php';
 
 class Waldo
 {
@@ -26,34 +27,39 @@ class Waldo
     public function __construct(
         ScreenshotterInterface $screenshotter,
         ScreenshotComparerInterface $screenshotComparer
-    )
-    {
+    ) {
         $this->screenshotter = $screenshotter;
         $this->screenshotComparer = $screenshotComparer;
     }
 
-    public function before(RawMinkContext $context, BeforeStepScope $scope)
-    {
-
+    public function before(
+        RawMinkContext $context,
+        BeforeScenarioScope $scenarioScope,
+        BeforeStepScope $stepScope
+    ) {
+        //
     }
 
-    public function after(RawMinkContext $context, AfterStepScope $scope)
-    {
+    public function after(
+        RawMinkContext $context,
+        BeforeScenarioScope $scenarioScope,
+        AfterStepScope $stepScope
+    ) {
         $script = file_get_contents(__DIR__.'/javascript.js');
         $context->getSession()->executeScript($script);
         $context->getSession()->wait(1000, 'XMLHttpRequest.active === 0 && window._behat_images_loaded');
 
-        $step = $scope->getStep()->getText();
+        $step = $stepScope->getStep()->getText();
 
-        if (strpos($step, 'see') !== false) {
+        if (strpos($step, 'I should see what I saw last time') === false) {
             return;
         }
         
-        $screenshot = $this->screenshotter->take($context, $scope);
+        $screenshot = $this->screenshotter->take($context, $scenarioScope, $stepScope);
 
-        if ($screenshot) {
-            $comparison = $this->screenshotComparer->compare($screenshot);
-            assertEquals(true, $comparison->match(), 'Visual Regression');
-        }
+       if ($screenshot) {
+           $comparison = $this->screenshotComparer->compare($screenshot);
+           assertEquals(true, $comparison->match(), 'Visual Regression');
+       }
     }
 }

@@ -3,6 +3,7 @@
 namespace AndHeiberg\WaldoBehatExtension\Screenshotter;
 
 use Behat\Behat\Hook\Scope\AfterStepScope;
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\MinkExtension\Context\RawMinkContext;
 use GuzzleHttp\ClientInterface;
 
@@ -26,7 +27,7 @@ class WaldoServerScreenshotter implements ScreenshotterInterface
     /**
      * {@inheritDoc}
      */
-    public function take(RawMinkContext $context, AfterStepScope $scope)
+    public function take(RawMinkContext $context, BeforeScenarioScope $scenarioScope, AfterStepScope $stepScope)
     {
         $screenshot = $context->getSession()->getScreenshot();
 
@@ -43,19 +44,19 @@ class WaldoServerScreenshotter implements ScreenshotterInterface
                     ],
                     [
                         'name'     => 'suite',
-                        'contents' => $scope->getSuite()->getName()
+                        'contents' => $stepScope->getSuite()->getName()
                     ],
                     [
                         'name'     => 'feature',
-                        'contents' => $scope->getFeature()->getTitle()
+                        'contents' => $stepScope->getFeature()->getTitle()
                     ],
                     [
                         'name'     => 'scenario',
-                        'contents' => null
+                        'contents' => $scenarioScope->getScenario()->getTitle()
                     ],
                     [
                         'name'     => 'step',
-                        'contents' => $scope->getStep()->getText()
+                        'contents' => $stepScope->getStep()->getText()
                     ],
                     [
                         'name'     => 'env',
