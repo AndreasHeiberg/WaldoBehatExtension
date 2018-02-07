@@ -42,8 +42,8 @@ use League\Flysystem\FilesystemInterface;
 
         $compare = $base->compare($screenshot);
 
-        $this->filesystem->put($output, $compare[0]->encode('png'));
+        $this->filesystem->put($output, $compare->getDiffImage()->encode('png'));
 
-        return new ComparisonResult($compare[1], $compare[0]);
+        return new ComparisonResult($compare->getScore(), $compare->getDiffImage());
     }
 }
