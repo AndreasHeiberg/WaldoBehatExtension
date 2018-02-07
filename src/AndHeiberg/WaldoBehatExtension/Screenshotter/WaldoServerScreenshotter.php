@@ -82,7 +82,7 @@ class WaldoServerScreenshotter implements ScreenshotterInterface
                     ],
                     [
                         'name'     => 'touch',
-                        'contents' => $context->getSession()->evaluateScript("('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch")
+                        'contents' => (int) $this->isTouch($context)
                     ],
                     [
                         'name'     => 'screenshot',
@@ -103,5 +103,13 @@ class WaldoServerScreenshotter implements ScreenshotterInterface
         $response = json_decode($response->getBody(), true);
 
         return $response['id'];
+    }
+
+    private function isTouch(RawMinkContext $context)
+    {
+        return $context->getSession()->evaluateScript("('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch")
+            ? true
+            : false
+        ;
     }
 }
