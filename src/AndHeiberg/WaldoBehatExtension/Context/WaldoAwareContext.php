@@ -3,12 +3,11 @@
 namespace AndHeiberg\WaldoBehatExtension\Context;
 
 use AndHeiberg\WaldoBehatExtension\Waldo;
-use Behat\Behat\Context\Context;
 
 /**
  * Waldo aware interface for contexts.
  */
-interface WaldoAwareContext extends Context
+interface WaldoAwareContext
 {
     /**
      * Sets Waldo instance.
