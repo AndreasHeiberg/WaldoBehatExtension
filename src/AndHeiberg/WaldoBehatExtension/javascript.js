@@ -33,7 +33,7 @@
 // only take screenshot when all images are loaded
 (function() {
     var script = document.createElement('script');
-    script.setAttribute('src', 'https://npmcdn.com/imagesloaded@4.1/imagesloaded.pkgd.min.js');
+    script.setAttribute('src', 'https://unpkg.com/imagesloaded@4.1/imagesloaded.pkgd.min.js');
     script.onload = function() {
         imagesLoaded('body', function() {
             window._behat_images_loaded = true;
